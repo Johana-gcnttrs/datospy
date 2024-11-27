@@ -1,26 +1,26 @@
 from flask import Flask, render_template
 
+
 app = Flask(__name__)
 
 @app.route("/")
 def hello_world():
-    return "<p>Hello, UABC 2024!</p>"
+    return "<p>Hola, estas en la materia de Patrones de Comportamiento!</p>"
 
 @app.route("/saludo")
 def saludoatodos():
-    return "<center>Saludos a todos los que me lean</center>"
+    return "<center>Bienvenido al analisis de NASCAR</center>"
 
 @app.route("/about")
 def sobremi():
-    return "<marquee><h1> orquidea.rivera@uabc.edu.mx </h1></marquee>"
+    return "<marquee><h1> Johana Galvan Contreras, Matricula: 368703  Correo: Johana.galvan@gmail.com</h1></marquee>"
 
 @app.route("/grafica")
 def grafica():
     import pandas as pd
     import matplotlib.pyplot as plt
-
     # Cargar el archivo Excel
-    archivo_excel = 'NASCAR.xlsx'  # Cambia esto si el archivo está en otra ubicación
+    archivo_excel = 'C:/Users/galva/datospy/flaskpage/NASCAR.xlsx'  # Cambia esto si el archivo está en otra ubicación
     df = pd.read_excel(archivo_excel)
 
     # 1. Cantidad total de puntos por cada fabricante
@@ -78,11 +78,52 @@ def grafica():
     plt.tight_layout(rect=[0, 0, 1, 0.95])
 
     # Guardar la grafica en un archivo (En este caso, PNG)
-    plt.savefig('.\static\images\grafica.png')
+    plt.savefig('C:/Users/galva/datospy/flaskpage/static/images/grafica.png')
 
     # Mostrar la gráfica
     plt.show()
     return render_template("grafica.html")
 
 
+@app.route("/matrix")
+def matrix():
+    import numpy as np
+    import pandas as pd
+    import matplotlib.pyplot as plt
 
+    # Ruta al archivo NASCAR.xlsx
+    archivo_excel = 'C:/Users/galva/datospy/flaskpage/NASCAR.xlsx'
+
+    # Cargar el archivo Excel
+    df = pd.read_excel(archivo_excel)
+
+    # Verificar que las columnas necesarias existen
+    if 'Driver' not in df.columns or 'Wins' not in df.columns:
+     return "El archivo debe contener las columnas 'Driver' y 'Wins'."
+
+    # Obtener pilotos y sus victorias
+    nodos = df['Driver'].tolist()
+    victorias = dict(zip(df['Driver'], df['Wins']))
+
+    # Crear matriz de adyacencia
+    matriz_adyacencia = np.array([[0] * len(nodos) for _ in range(len(nodos))])
+
+    # Rellenar la matriz: dos pilotos están conectados si tienen el mismo número de victorias
+    for i, piloto1 in enumerate(nodos):
+        for j, piloto2 in enumerate(nodos):
+            if i != j and victorias.get(piloto1) == victorias.get(piloto2):
+                matriz_adyacencia[i, j] = 1
+
+    # Mostrar la matriz en la consola
+    print("Matriz de Adyacencia:")
+    print(matriz_adyacencia)
+
+    # Ejemplo de conexiones desde el primer nodo
+    nodo_inicio = nodos[0]
+    indice_inicio = nodos.index(nodo_inicio)
+    conexiones = [nodos[i] for i, conectado in enumerate(matriz_adyacencia[indice_inicio]) if conectado == 1]
+    plt.tight_layout(rect=[0, 0, 1, 0.95])
+    plt.savefig('C:/Users/galva/datospy/flaskpage/static/images/grafica.png')
+
+    #print(f"El nodo {nodo_inicio} está conectado con: {', '.join(conexiones)}")
+    return render_template("grafica.html")
